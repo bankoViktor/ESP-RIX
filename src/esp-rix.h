@@ -1,4 +1,4 @@
-#define RIX_VERSION "0.2"
+#define RIX_VERSION "0.3"
 
 #if defined(ESP8266)
 	#include <ESP8266WiFi.h>
@@ -36,26 +36,29 @@
 ///////////////////////////////////////////////////////////////////////
 #else
 
-#define ALERT       1
-#define CRITICAL    2
-#define ERROR       3
-#define WARNING     4
-#define NOTICE      5
-#define INFORMATION 6
-#define DEBUG       7
+/* Levels */
+enum class RixLevels {
+	ALERT = 1,
+	CRITICAL,
+	ERROR,
+	WARNING,
+	NOTICE,
+	INFORMATION,
+	DEBUG
+};
 
 // Macros to wrap around debug print so we can capture the calling function name
-#define rix_1(fmt, ...) __debug_print(__func__, ALERT      , fmt, ##__VA_ARGS__)
-#define rix_2(fmt, ...) __debug_print(__func__, CRITICAL   , fmt, ##__VA_ARGS__)
-#define rix_3(fmt, ...) __debug_print(__func__, ERROR      , fmt, ##__VA_ARGS__)
-#define rix_4(fmt, ...) __debug_print(__func__, WARNING    , fmt, ##__VA_ARGS__)
-#define rix_5(fmt, ...) __debug_print(__func__, NOTICE     , fmt, ##__VA_ARGS__)
-#define rix_6(fmt, ...) __debug_print(__func__, INFORMATION, fmt, ##__VA_ARGS__)
-#define rix_7(fmt, ...) __debug_print(__func__, DEBUG      , fmt, ##__VA_ARGS__)
+#define rix_1(fmt, ...) __debug_print(__func__, RixLevels::ALERT      , fmt, ##__VA_ARGS__)
+#define rix_2(fmt, ...) __debug_print(__func__, RixLevels::CRITICAL   , fmt, ##__VA_ARGS__)
+#define rix_3(fmt, ...) __debug_print(__func__, RixLevels::ERROR      , fmt, ##__VA_ARGS__)
+#define rix_4(fmt, ...) __debug_print(__func__, RixLevels::WARNING    , fmt, ##__VA_ARGS__)
+#define rix_5(fmt, ...) __debug_print(__func__, RixLevels::NOTICE     , fmt, ##__VA_ARGS__)
+#define rix_6(fmt, ...) __debug_print(__func__, RixLevels::INFORMATION, fmt, ##__VA_ARGS__)
+#define rix_7(fmt, ...) __debug_print(__func__, RixLevels::DEBUG      , fmt, ##__VA_ARGS__)
 
-void __debug_print(const char* func, int level, const char* format, ...);
+void __debug_print(const char* func, RixLevels level, const char* format, ...);
 void handle_rix();
-void rix_log_level(int level);
+void rix_log_level(RixLevels level);
 void rix_delay(unsigned int ms);
 int  rix_color(int num);
 int  rix_init_wifi(const char *ssid, const char *password);

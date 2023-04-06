@@ -7,7 +7,7 @@
 const char* LEVEL_NAMES[8] = {"NONE", "ALERT", "CRITICAL", "ERROR", "WARNING", "NOTICE", "INFORMATION", "DEBUG"};
 
 unsigned long prev_time = 0; // Millis when the last log entry was sent
-int LOG_LEVEL           = 7; // Starting log level
+RixLevels LOG_LEVEL     = RixLevels::DEBUG; // Starting log level
 int RIX_COLOR           = 1; // Color enabled/disabled
 int RIX_TCP_PORT        = 23;
 
@@ -174,7 +174,7 @@ void handle_rix() {
 		// It's a number 1 - 7 we set the log level
 		} else if (is_level_number) {
 			// Convert char to int: https://stackoverflow.com/questions/5029840/convert-char-to-int-in-c-and-c
-			int level = str[0] - '0';
+			RixLevels level = (RixLevels)(str[0] - '0');
 			rix_log_level(level);
 		}
 	// New telnet session
@@ -204,7 +204,7 @@ void handle_rix() {
 }
 
 // This is underlying function that sends the log lines to telnet clients
-void __debug_print(const char* function_name, int level, const char* format, ...) {
+void __debug_print(const char* function_name, RixLevels level, const char* format, ...) {
 	// Check if there are any pening input commands (quit, change level) before we print
 	handle_rix();
 
@@ -222,26 +222,26 @@ void __debug_print(const char* function_name, int level, const char* format, ...
 	char color[25];
 
 	// Alert - Dark Purple
-	if (level == ALERT) {
+	if (level == RixLevels::ALERT) {
 		//strncpy(color, "\x1B[48;5;90m\x1B[38;5;15m", 25);
 		strncpy(color, "\x1B[38;5;90m", 12);
 	// Critical - Red
-	} else if (level == CRITICAL) {
+	} else if (level == RixLevels::CRITICAL) {
 		strncpy(color, "\x1B[38;5;196m", 12);
 	// Error - Orange
-	} else if (level == ERROR) {
+	} else if (level == RixLevels::ERROR) {
 		strncpy(color, "\x1B[38;5;208m", 12);
 	// Warning - Yellow
-	} else if (level == WARNING) {
+	} else if (level == RixLevels::WARNING) {
 		strncpy(color, "\x1B[38;5;226m", 12);
 	// Notice - White
-	} else if (level == NOTICE) {
+	} else if (level == RixLevels::NOTICE) {
 		strncpy(color, "\x1B[38;5;15m", 12);
 	// Informational - Light Green
-	} else if (level == INFORMATION) {
+	} else if (level == RixLevels::INFORMATION) {
 		strncpy(color, "\x1B[38;5;156m", 12);
 	// Debug - Light Blue
-	} else if (level == DEBUG) {
+	} else if (level == RixLevels::DEBUG) {
 		strncpy(color, "\x1B[38;5;123m", 12);
 	}
 
@@ -291,16 +291,16 @@ void rix_tcp_port(int port) {
 }
 
 // Change the logging level for a connected client
-void rix_log_level(int level) {
+void rix_log_level(RixLevels level) {
 	// We only allow levels 0 - 7
-	if (level < 0 || level > 7) {
+	if ((int)level < 0 || (int)level > 7) {
 		return;
 	}
 
 	char level_name[15] = "???";
-	strcpy(level_name, LEVEL_NAMES[level]);
+	strcpy(level_name, LEVEL_NAMES[(int)level]);
 
-	if (level > 1) {
+	if ((int)level > 1) {
 		client.printf("Setting log level to %d (%s) and above\r\n", level, level_name);
 	} else {
 		client.printf("Setting log level to %d (%s)\r\n", level, level_name);
@@ -311,14 +311,14 @@ void rix_log_level(int level) {
 }
 
 // First pass at a wrapper function... this is not used anymore
-void __xdebugN(const char* function_name, int level, const char* format, ...) {
+void __xdebugN(const char* function_name, RixLevels level, const char* format, ...) {
 	va_list args;
 	va_start(args, format);
 	char buf[300];
 	vsnprintf(buf, 300, format, args);
 	va_end(args);
 
-	__debug_print("", INFORMATION, buf, NOTICE);
+	__debug_print("", RixLevels::INFORMATION, buf, RixLevels::NOTICE);
 }
 
 // If the MCU is in a delay() it cannot respond to HTTP OTA requests
