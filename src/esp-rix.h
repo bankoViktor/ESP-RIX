@@ -9,6 +9,17 @@
 	#define RIX_DISABLE
 #endif
 
+/* Levels */
+enum class RixLevels {
+	Alert = 1,
+	Critical,
+	Error,
+	Warning,
+	Notice,
+	Information,
+	Debug
+};
+
 ///////////////////////////////////////////////////////////////////////
 // The library is disabled so we null out a bunch of functions
 ///////////////////////////////////////////////////////////////////////
@@ -26,26 +37,15 @@
 // Nulled out
 #define handle_rix()
 #define rix_log_level(x)
-#define rix_color(x) (0)
+#define rix_color(x)
 #define rix_delay(ms) delay(ms)
-#define rix_init_wifi(x, y) (0)
-#define rix_tcp_port()
+#define rix_init_wifi(x, y)
+#define rix_tcp_port(x)
 
 ///////////////////////////////////////////////////////////////////////
 // The library is enabled so business as usual
 ///////////////////////////////////////////////////////////////////////
 #else
-
-/* Levels */
-enum class RixLevels {
-	ALERT = 1,
-	CRITICAL,
-	ERROR,
-	WARNING,
-	NOTICE,
-	INFORMATION,
-	DEBUG
-};
 
 // Macros to wrap around debug print so we can capture the calling function name
 #define rix_1(fmt, ...) __debug_print(__func__, RixLevels::ALERT      , fmt, ##__VA_ARGS__)

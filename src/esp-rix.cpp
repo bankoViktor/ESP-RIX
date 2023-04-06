@@ -7,7 +7,7 @@
 const char* LEVEL_NAMES[8] = {"NONE", "ALERT", "CRITICAL", "ERROR", "WARNING", "NOTICE", "INFORMATION", "DEBUG"};
 
 unsigned long prev_time = 0; // Millis when the last log entry was sent
-RixLevels LOG_LEVEL     = RixLevels::DEBUG; // Starting log level
+RixLevels LOG_LEVEL     = RixLevels::Debug; // Starting log level
 int RIX_COLOR           = 1; // Color enabled/disabled
 int RIX_TCP_PORT        = 23;
 
@@ -222,26 +222,26 @@ void __debug_print(const char* function_name, RixLevels level, const char* forma
 	char color[25];
 
 	// Alert - Dark Purple
-	if (level == RixLevels::ALERT) {
+	if (level == RixLevels::Alert) {
 		//strncpy(color, "\x1B[48;5;90m\x1B[38;5;15m", 25);
 		strncpy(color, "\x1B[38;5;90m", 12);
 	// Critical - Red
-	} else if (level == RixLevels::CRITICAL) {
+	} else if (level == RixLevels::Critical) {
 		strncpy(color, "\x1B[38;5;196m", 12);
 	// Error - Orange
-	} else if (level == RixLevels::ERROR) {
+	} else if (level == RixLevels::Error) {
 		strncpy(color, "\x1B[38;5;208m", 12);
 	// Warning - Yellow
-	} else if (level == RixLevels::WARNING) {
+	} else if (level == RixLevels::Warning) {
 		strncpy(color, "\x1B[38;5;226m", 12);
 	// Notice - White
-	} else if (level == RixLevels::NOTICE) {
+	} else if (level == RixLevels::Notice) {
 		strncpy(color, "\x1B[38;5;15m", 12);
 	// Informational - Light Green
-	} else if (level == RixLevels::INFORMATION) {
+	} else if (level == RixLevels::Information) {
 		strncpy(color, "\x1B[38;5;156m", 12);
 	// Debug - Light Blue
-	} else if (level == RixLevels::DEBUG) {
+	} else if (level == RixLevels::Debug) {
 		strncpy(color, "\x1B[38;5;123m", 12);
 	}
 
@@ -301,9 +301,9 @@ void rix_log_level(RixLevels level) {
 	strcpy(level_name, LEVEL_NAMES[(int)level]);
 
 	if ((int)level > 1) {
-		client.printf("Setting log level to %d (%s) and above\r\n", level, level_name);
+		client.printf("Setting log level to %i (%s) and above\r\n", (int)level, level_name);
 	} else {
-		client.printf("Setting log level to %d (%s)\r\n", level, level_name);
+		client.printf("Setting log level to %i (%s)\r\n", (int)level, level_name);
 	}
 
 	// Store the level so __debug_print() knows what to filter out
@@ -318,7 +318,7 @@ void __xdebugN(const char* function_name, RixLevels level, const char* format, .
 	vsnprintf(buf, 300, format, args);
 	va_end(args);
 
-	__debug_print("", RixLevels::INFORMATION, buf, RixLevels::NOTICE);
+	__debug_print("", RixLevels::Information, buf, RixLevels::Notice);
 }
 
 // If the MCU is in a delay() it cannot respond to HTTP OTA requests
