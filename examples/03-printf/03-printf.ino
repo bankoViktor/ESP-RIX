@@ -7,7 +7,7 @@ void setup() {
 }
 
 void loop() {
-	handle_rix();
+	rix_handle();
 
 	float pi = 3.14159265;
 

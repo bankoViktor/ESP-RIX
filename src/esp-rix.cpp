@@ -89,7 +89,7 @@ void rix_color(bool newState) {
 // Goes in loop() and listens for telnet connections
 // Checks for input for commands
 // Outputs log lines to connected clients
-void handle_rix() {
+void rix_handle() {
 	static bool first = 1;
 	static WiFiServer TelnetServer(nTcpPort);
 
@@ -197,7 +197,7 @@ void handle_rix() {
 // This is underlying function that sends the log lines to telnet clients
 void __debug_print(const char* function_name, RixLevels level, const char* format, ...) {
 	// Check if there are any pening input commands (quit, change level) before we print
-	handle_rix();
+	rix_handle();
 
 	// If there are no connected clients, don't print anything
 	if (!client || !client.connected()) {
@@ -319,7 +319,7 @@ void rix_delay(unsigned int ms) {
 	decltype(millis()) last = millis();
 
 	while ((millis() - last) < ms) {
-		handle_rix();
+		rix_handle();
 		::delay(5);
 	}
 }

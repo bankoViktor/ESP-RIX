@@ -35,7 +35,7 @@ enum class RixLevels {
 #define rix_7(fmt, ...)
 
 // Nulled out
-#define handle_rix()
+#define rix_handle()
 #define rix_log_level(x)
 #define rix_color(x)
 #define rix_delay(ms) delay(ms)
@@ -48,16 +48,16 @@ enum class RixLevels {
 #else
 
 // Macros to wrap around debug print so we can capture the calling function name
-#define rix_1(fmt, ...) __debug_print(__func__, RixLevels::ALERT      , fmt, ##__VA_ARGS__)
-#define rix_2(fmt, ...) __debug_print(__func__, RixLevels::CRITICAL   , fmt, ##__VA_ARGS__)
-#define rix_3(fmt, ...) __debug_print(__func__, RixLevels::ERROR      , fmt, ##__VA_ARGS__)
-#define rix_4(fmt, ...) __debug_print(__func__, RixLevels::WARNING    , fmt, ##__VA_ARGS__)
-#define rix_5(fmt, ...) __debug_print(__func__, RixLevels::NOTICE     , fmt, ##__VA_ARGS__)
-#define rix_6(fmt, ...) __debug_print(__func__, RixLevels::INFORMATION, fmt, ##__VA_ARGS__)
-#define rix_7(fmt, ...) __debug_print(__func__, RixLevels::DEBUG      , fmt, ##__VA_ARGS__)
+#define rix_1(fmt, ...) __debug_print(__func__, RixLevels::Alert      , fmt, ##__VA_ARGS__)
+#define rix_2(fmt, ...) __debug_print(__func__, RixLevels::Critical   , fmt, ##__VA_ARGS__)
+#define rix_3(fmt, ...) __debug_print(__func__, RixLevels::Error      , fmt, ##__VA_ARGS__)
+#define rix_4(fmt, ...) __debug_print(__func__, RixLevels::Warning    , fmt, ##__VA_ARGS__)
+#define rix_5(fmt, ...) __debug_print(__func__, RixLevels::Notice     , fmt, ##__VA_ARGS__)
+#define rix_6(fmt, ...) __debug_print(__func__, RixLevels::Information, fmt, ##__VA_ARGS__)
+#define rix_7(fmt, ...) __debug_print(__func__, RixLevels::Debug      , fmt, ##__VA_ARGS__)
 
 void __debug_print(const char* func, RixLevels level, const char* format, ...);
-void handle_rix();
+void rix_handle();
 void rix_log_level(RixLevels level);
 void rix_delay(unsigned int ms);
 void rix_color(bool newState);

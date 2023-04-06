@@ -7,7 +7,7 @@ void setup() {
 }
 
 void loop() {
-	handle_rix();
+	rix_handle();
 
 	rix_1("ALERT message");
 	rix_2("CRITICAL message");

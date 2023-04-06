@@ -41,7 +41,7 @@ void loop() {
 	// Rix also supports printf style messages
 	rix_5("MCU Uptime: %d minutes", millis() / 1000 / 60);
 
-	handle_rix();
+	rix_handle();
 }
 ```
 
@@ -53,7 +53,7 @@ ESP's IP address to view the messages.
 Enable/disable color in output
 
 ```C
-rix_color(0); // Disable color
+rix_color(false); // Disable color
 ```
 
 Set the initial output logging level

@@ -5,12 +5,12 @@ void setup() {
 
 	int ok = rix_init_wifi("YourSSID", "SekritPass");
 
-	rix_color(0);     // Disable color
-	rix_log_level(4); // Starting log level is 4
+	rix_color(false);     // Disable color
+	rix_log_level(RixLevels::Warning); // Starting log level is 4
 }
 
 void loop() {
-	handle_rix();
+	rix_handle();
 
 	rix_1("This is an ALERT");
 	rix_3("This is an error %d", 37);
