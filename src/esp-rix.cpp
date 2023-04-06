@@ -180,7 +180,7 @@ void handle_rix() {
 	// New telnet session
 	} else {
 		// If there is a client connected we grab it
-		client = TelnetServer.available();
+		client = TelnetServer.accept();
 
 		// Reset the logging time in case of disconnect/reconnect
 		prev_time = 0;
