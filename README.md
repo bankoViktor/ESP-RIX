@@ -94,6 +94,16 @@ before the include line. This will make all the `rix_*` calls no-ops, and
 disable logging. This means you can leave all your setup and logging calls in
 your code and simply disable the library at compile time.
 
+# Enable alternative log format
+
+To enable an alternate log format (like `"HHH:MM:SS:FFF  LEVEL  Message"`),  add:
+
+```C
+# define RIX_FORMAT_EX
+```
+
+before the include line.
+
 # Backwards compatibility
 
 On non-ESP boards RIX is **automatically** disabled. This allows you to test
