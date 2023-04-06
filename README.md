@@ -17,8 +17,25 @@ your project is in an inaccessible location, and serial isn't available.
 
 # Installation
 
+### Arduino IDE
+
 Clone this repo to your Arduino libraries directory. On Linux this is
 `~/Arduino/libraries/`
+
+### VSCode PlatformIO
+
+Add the repo link to platformio ini-file:
+
+```ini
+[env]
+platform = espressif8266
+board = nodemcuv2
+framework = arduino
+monitor_speed = 74800
+lib_deps = https://github.com/<user>/<repo>.git
+```
+
+More on [PlatformIO](https://docs.platformio.org/en/stable/projectconf/sections/env/options/library/lib_deps.html) documentation.
 
 # Usage
 
@@ -35,11 +52,11 @@ void loop() {
 	// Other loop code here
 
 	// Rix supports 7 levels of debug messages
-	rix_1("This is a LEVEL 1 message");
-	rix_7("This is a LEVEL 7 message");
+	rix_info("This is a INFORMATION message");
+	rix_error("This is a ERROR message");
 
 	// Rix also supports printf style messages
-	rix_5("MCU Uptime: %d minutes", millis() / 1000 / 60);
+	rix_trace("MCU Uptime: %d minutes", millis() / 1000 / 60);
 
 	rix_handle();
 }
@@ -50,23 +67,31 @@ ESP's IP address to view the messages.
 
 # Library options
 
+#### On/Off color
+
 Enable/disable color in output
 
 ```C
-rix_color(false); // Disable color
+rix_color(false); // Disable color, default: true
 ```
+
+#### Max log level
 
 Set the initial output logging level
 
 ```C
-rix_log_level(4); // Default: 7
+rix_log_level(RixLevels::Information); // Default: RixLevels::Trace (5)
 ```
+
+#### Set TCP port
 
 Change the TCP port that RIX listens on
 
 ```C
 rix_tcp_port(2300); // Default: 23
 ```
+
+#### Special delay function
 
 Using `delay()` in your scripts may cause RIX to be less responsive. A
 `rix_delay()` method has been added as a drop-in replacement to keep your
@@ -75,6 +100,8 @@ project responsive.
 ```C
 rix_delay(500); // Wait 500 ms
 ```
+
+#### Special Wi-Fi connection function
 
 RIX has a function to make connecting to your WiFi simple:
 

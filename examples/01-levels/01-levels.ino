@@ -1,23 +1,22 @@
 #include <esp-rix.h>
 
 void setup() {
-	Serial.begin(115200);
+    Serial.begin(115200);
 
-	int ok = rix_init_wifi("YourSSID", "SekritPass");
+    int ok = rix_init_wifi("YourSSID", "SekritPass");
 }
 
 void loop() {
-	rix_handle();
+    rix_handle();
 
-	rix_1("ALERT message");
-	rix_2("CRITICAL message");
-	rix_3("ERROR message");
-	rix_4("WARNING message");
-	rix_5("NOTICE message");
-	rix_6("INFORMATION message");
-	rix_7("DEBUG message");
+    rix_critical("CRITICAL message");
+    rix_error("ERROR message");
+    rix_warn("WARNING message");
+    rix_info("INFORMATION message");
+    rix_debug("DEBUG message");
+    rix_trace("TRACE message");
 
-	Serial.println("Loooping");
+    Serial.println("Loooping");
 
-	rix_delay(2000);
+    rix_delay(2000);
 }
