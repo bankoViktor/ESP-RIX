@@ -90,20 +90,15 @@ static const char *level_to_color(RixLevels eLevel) {
 // This is underlying function that sends the log lines to telnet clients
 void __debug_print2(RixLevels eLevel, const char *format, ...) {
     // Check if there are any pening input commands (quit, change level) before we print
-    //rix_handle();
+    rix_handle();
 
     // If there are no connected clients, don't print anything
-    if (!g_client || !g_client.connected())
+    if (!g_client.connected())
         return;
 
     // If this log element is above our threshold we don't display it
     if (eLevel > g_eLevel)
         return;
-
-    static int ln = 1;
-    g_client.printf("line %i\r\n", ln++);
-
-    return;
 
     // Get the variadic params from this function
     va_list args;
@@ -132,12 +127,8 @@ void __debug_print2(RixLevels eLevel, const char *format, ...) {
     if (g_xColorEnable)
         g_client.print(pszColor);
 
-    //int len = strlen(pzTime);
-    //Serial.printf("-- '%s' len %i\n", pzTime, len);
-    //Serial.printf("-- '%s'\n", format);
-
-    //g_client.print(pzTime);
-    //g_client.print("  ");
+    g_client.print(pzTime);
+    g_client.print("  ");
 
     static const char *aszLevelNames[] = {
         "CRIT ",
@@ -209,11 +200,6 @@ void __debug_print(const char *function_name, RixLevels eLevel, const char *form
 
     // Save this for the next time
     g_nPrevTime = millis();
-}
-
-// On/off color
-void rix_color(bool newState) {
-    g_xColorEnable = newState;
 }
 
 // Goes in loop() and listens for telnet connections
@@ -331,6 +317,11 @@ void rix_handle() {
 // Set the TCP port to use
 void rix_tcp_port(int port) {
     g_nTcpPort = port;
+}
+
+// On/off color
+void rix_color(bool newState) {
+    g_xColorEnable = newState;
 }
 
 // Change the logging level for a connected client
