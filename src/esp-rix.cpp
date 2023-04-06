@@ -260,7 +260,7 @@ void __debug_print(const char* function_name, RixLevels level, const char* forma
 
 	// Milli-second string
 	char ms_str[20] = "";
-	snprintf(ms_str, 20, "(%04dms) ", diff);
+	snprintf(ms_str, 20, "(%04lums) ", diff);
 
 	// Function name string
 	char func_str[100] = "";
