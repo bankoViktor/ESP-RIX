@@ -4,30 +4,28 @@
 
 #ifndef RIX_DISABLE
 
-const char* LEVEL_NAMES[8] = {"NONE", "ALERT", "CRITICAL", "ERROR", "WARNING", "NOTICE", "INFORMATION", "DEBUG"};
+static const char *aszLevelNames[8] = {"NONE", "ALERT", "CRITICAL", "ERROR", "WARNING", "NOTICE", "INFORMATION", "DEBUG"};
+static unsigned long nPrevTime 	= 0; 				// Millis when the last log entry was sent
+static RixLevels eLevel     	= RixLevels::Debug; // Starting log level
+static bool xColorEnable        = true; 			// Color enabled/disabled
+static int nTcpPort = 23;
+static WiFiClient client;
 
-unsigned long prev_time = 0; // Millis when the last log entry was sent
-RixLevels LOG_LEVEL     = RixLevels::Debug; // Starting log level
-int RIX_COLOR           = 1; // Color enabled/disabled
-int RIX_TCP_PORT        = 23;
+// Send the local echo
+// static void local_echo(WiFiClient client, int num) {
+// 	client.write(255);
+// 	client.write(251);
 
-WiFiClient client;
+// 	if (num) {
+// 		//client.write(0);
+// 		//??????
+// 	} else {
+// 		client.write(1);
+// 	}
+// }
 
-// Send the Telnet banner
-void local_echo(WiFiClient client, int num) {
-	client.write(255);
-	client.write(251);
-
-	if (num) {
-		//client.write(0);
-		//??????
-	} else {
-		client.write(1);
-	}
-}
-
-// Send the Telnet banner
-void show_help(WiFiClient client) {
+// Send the Help
+static void show_help(WiFiClient client) {
 	client.println("c) Toggle color on or off");
 	client.println("m) Show free memory");
 	client.println("q) Quit and logout of ESP");
@@ -50,7 +48,7 @@ void show_help(WiFiClient client) {
 }
 
 // Send the Telnet banner
-void send_banner(WiFiClient client) {
+static void send_banner(WiFiClient client) {
 	String ipaddr  = rix_ip2string(WiFi.localIP());
 	String mac     = WiFi.macAddress();
 	String sdk_ver = ESP.getSdkVersion();
@@ -65,7 +63,7 @@ void send_banner(WiFiClient client) {
 	#endif
 
 	// Make the header WHITE
-	if (RIX_COLOR) {
+	if (xColorEnable) {
 		client.print("\x1B[1m");       // Bold
 		client.print("\x1B[38;5;15m"); // White
 	}
@@ -77,21 +75,15 @@ void send_banner(WiFiClient client) {
 	client.println("=======================================================\r\n");
 
 	// Reset the color
-	if (RIX_COLOR) {
+	if (xColorEnable) {
 		client.print("\x1B[0m");
 	}
 
 	show_help(client);
 }
 
-int rix_color(int num) {
-	if (num == -1) {
-		RIX_COLOR = !RIX_COLOR;
-	} else {
-		RIX_COLOR = num;
-	}
-
-	return RIX_COLOR;
+void rix_color(bool newState) {
+	xColorEnable = newState;
 }
 
 // Goes in loop() and listens for telnet connections
@@ -99,14 +91,13 @@ int rix_color(int num) {
 // Outputs log lines to connected clients
 void handle_rix() {
 	static bool first = 1;
-	static WiFiServer TelnetServer(RIX_TCP_PORT);
+	static WiFiServer TelnetServer(nTcpPort);
 
 	if (first) {
 		TelnetServer.begin();
 		TelnetServer.setNoDelay(true);
 		first = 0;
 	}
-
 
 	// Already connected telnet session
 	if (client && client.connected()) {
@@ -152,12 +143,12 @@ void handle_rix() {
 			delay(2000);
 		// If we got the color command
 		} else if (strcmp(str, "c") == 0) {
-			if (RIX_COLOR) {
+			if (xColorEnable) {
 				client.printf("Disabling color\r\n");
-				rix_color(0);
+				rix_color(false);
 			} else {
 				client.printf("Enbabling color\r\n");
-				rix_color(1);
+				rix_color(true);
 			}
 		// Free memory
 		} else if (strcmp(str, "m") == 0) {
@@ -183,7 +174,7 @@ void handle_rix() {
 		client = TelnetServer.accept();
 
 		// Reset the logging time in case of disconnect/reconnect
-		prev_time = 0;
+		nPrevTime = 0;
 
 		if (client) {
 			// Disable local echo
@@ -214,7 +205,7 @@ void __debug_print(const char* function_name, RixLevels level, const char* forma
 	}
 
 	// If this log element is above our threshold we don't display it
-	if (level > LOG_LEVEL) {
+	if (level > eLevel) {
 		return;
 	}
 
@@ -253,8 +244,8 @@ void __debug_print(const char* function_name, RixLevels level, const char* forma
 	va_end(args);
 
 	// Calculate how long between the last call, and this one
-	unsigned long diff = millis() - prev_time;
-	if (!prev_time) {
+	unsigned long diff = millis() - nPrevTime;
+	if (!nPrevTime) {
 		diff = 0;
 	}
 
@@ -267,7 +258,7 @@ void __debug_print(const char* function_name, RixLevels level, const char* forma
 	snprintf(func_str, 100, "(F: %s) ", function_name);
 
 	// Send the color and text data to the telnet client
-	if (RIX_COLOR) {
+	if (xColorEnable) {
 		client.print(color);
 	}
 
@@ -275,19 +266,19 @@ void __debug_print(const char* function_name, RixLevels level, const char* forma
 	client.print(func_str);
 	client.print(buf);
 
-	if (RIX_COLOR) {
+	if (xColorEnable) {
 		client.print(reset);
 	}
 
 	client.print("\r\n");
 
 	// Save this for the next time
-	prev_time = millis();
+	nPrevTime = millis();
 }
 
 // Set the TCP port to use
 void rix_tcp_port(int port) {
-	RIX_TCP_PORT = port;
+	nTcpPort = port;
 }
 
 // Change the logging level for a connected client
@@ -298,7 +289,7 @@ void rix_log_level(RixLevels level) {
 	}
 
 	char level_name[15] = "???";
-	strcpy(level_name, LEVEL_NAMES[(int)level]);
+	strcpy(level_name, aszLevelNames[(int)level]);
 
 	if ((int)level > 1) {
 		client.printf("Setting log level to %i (%s) and above\r\n", (int)level, level_name);
@@ -307,7 +298,7 @@ void rix_log_level(RixLevels level) {
 	}
 
 	// Store the level so __debug_print() knows what to filter out
-	LOG_LEVEL = level;
+	eLevel = level;
 }
 
 // First pass at a wrapper function... this is not used anymore

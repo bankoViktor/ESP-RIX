@@ -60,7 +60,7 @@ void __debug_print(const char* func, RixLevels level, const char* format, ...);
 void handle_rix();
 void rix_log_level(RixLevels level);
 void rix_delay(unsigned int ms);
-int  rix_color(int num);
+void rix_color(bool newState);
 int  rix_init_wifi(const char *ssid, const char *password);
 void rix_tcp_port(int num);
 String rix_ip2string(IPAddress ip);
